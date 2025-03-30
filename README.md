@@ -4,11 +4,40 @@
 
 This service pairs users based on their ELO rating and a liquidity window, allowing them to play chess games where they can bet on the outcome. The matchmaking API communicates with the game state API using web sockets and Redis to manage game sessions and player connections.
 
-## Architecture
+## Basic Matchmaking Flow
+
+This simplified diagram shows how the matchmaking service matches players by communicating with a PostgreSQL database.
+
+```mermaid
+graph TD;
+    A[Receive Match Request] --> B[Fetch Player Data from PostgreSQL];
+    B --> C[Check ELO & Liquidity];
+    C -->|Valid| D[Find Suitable Opponent];
+    D --> E[Create Match Entry in PostgreSQL];
+    E --> F[Send Match Details to Players];
+    C -->|Invalid| G[Reject Request];
+```
+
+## Internal Logic Flow
+
+This diagram outlines the internal logic of the matchmaking service, from receiving a match request to selecting the best server and sending connection information to players.
+
+```mermaid
+graph TD;
+    A[Receive Match Request] --> B[Validate User ELO & Liquidity];
+    B -->|Valid| C[Query Redis for Active Servers];
+    C --> D[Evaluate Server Load & Region];
+    D --> E[Select Best Server];
+    E --> F[Store Server Info in Redis];
+    F --> G[Generate Match ID];
+    G --> H[Send WebSocket Info to Players];
+    H --> I[Players Connect to Game State API];
+    B -->|Invalid| J[Reject Request];
+```
+
+## System Architecture and Communication Flow
 
 The matchmaking API interacts with the game state API to facilitate real-time gameplay. The game state API servers register themselves in Redis and update their status periodically. The matchmaking API queries Redis to find the best game state API server for a match, ensuring optimal load distribution and regional considerations.
-
-## Communication Flow
 
 ```mermaid
 graph TD;
@@ -44,33 +73,3 @@ If a player disconnects, they can call the matchmaking API (or a dedicated recon
 ## License
 
 This project is licensed under the MIT License.
-
-## Internal Logic Diagram
-
-```mermaid
-graph TD;
-    A[Receive Match Request] --> B[Validate User ELO & Liquidity];
-    B -->|Valid| C[Query Redis for Active Servers];
-    C --> D[Evaluate Server Load & Region];
-    D --> E[Select Best Server];
-    E --> F[Store Server Info in Redis];
-    F --> G[Generate Match ID];
-    G --> H[Send WebSocket Info to Players];
-    H --> I[Players Connect to Game State API];
-    B -->|Invalid| J[Reject Request];
-```
-
-
-## Simple Matchmaking Logic Diagram
-
-This simplified diagram shows how the matchmaking service matches players by communicating with a PostgreSQL database.
-
-```mermaid
-graph TD;
-    A[Receive Match Request] --> B[Fetch Player Data from PostgreSQL];
-    B --> C[Check ELO & Liquidity];
-    C -->|Valid| D[Find Suitable Opponent];
-    D --> E[Create Match Entry in PostgreSQL];
-    E --> F[Send Match Details to Players];
-    C -->|Invalid| G[Reject Request];
-```
