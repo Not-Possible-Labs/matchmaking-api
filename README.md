@@ -44,3 +44,33 @@ If a player disconnects, they can call the matchmaking API (or a dedicated recon
 ## License
 
 This project is licensed under the MIT License.
+
+## Internal Logic Diagram
+
+```mermaid
+graph TD;
+    A[Receive Match Request] --> B[Validate User ELO & Liquidity];
+    B -->|Valid| C[Query Redis for Active Servers];
+    C --> D[Evaluate Server Load & Region];
+    D --> E[Select Best Server];
+    E --> F[Store Server Info in Redis];
+    F --> G[Generate Match ID];
+    G --> H[Send WebSocket Info to Players];
+    H --> I[Players Connect to Game State API];
+    B -->|Invalid| J[Reject Request];
+```
+
+
+## Simple Matchmaking Logic Diagram
+
+This simplified diagram shows how the matchmaking service matches players by communicating with a PostgreSQL database.
+
+```mermaid
+graph TD;
+    A[Receive Match Request] --> B[Fetch Player Data from PostgreSQL];
+    B --> C[Check ELO & Liquidity];
+    C -->|Valid| D[Find Suitable Opponent];
+    D --> E[Create Match Entry in PostgreSQL];
+    E --> F[Send Match Details to Players];
+    C -->|Invalid| G[Reject Request];
+```
