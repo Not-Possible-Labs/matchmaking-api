@@ -1,0 +1,26 @@
+{
+  "nodeModulesDir": "auto",
+  "permissions": {
+    "env": ["NO_DEPRECATION", "NODE_ENV", "PORT", "LOG_LEVEL", "DATABASE_URL", "DIRECT_URL", "HOST"],
+    "ffi": true,
+    "net": true,
+    "read": true
+  },
+  "tasks": {
+    "dev": "deno run --allow-all src/main.ts",
+    "start": "deno run --allow-all src/main.ts",
+    "watch": "deno run --allow-all --watch src/main.ts"
+  },
+  "imports": {
+    "express": "npm:express@4",
+    "@types/express": "npm:@types/express@4",
+    "@scalar/express-api-reference": "npm:@scalar/express-api-reference@0.2",
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
+    "@prisma/client": "npm:@prisma/client@5.10.2",
+    "generated/": "./node_modules/generated/"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "types": ["./types.d.ts"]
+  }
+}
