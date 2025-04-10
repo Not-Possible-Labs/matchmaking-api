@@ -16,7 +16,11 @@ const app = express();
 
 // Configure middleware
 app.use(express.json());
-app.use(morgan("dev")); // Add request logging
+app.use(
+  morgan("dev", {
+    skip: (req: express.Request) => req.url === "/healthcheck",
+  })
+); // Add request logging with healthcheck filter
 
 // Root route redirect to API documentation
 app.get("/", (_req, res) => {
@@ -38,17 +42,17 @@ const openApiSpec = {
   servers:
     env === "local"
       ? [
-        {
-          url: "http://localhost:8000",
-          description: "Local Dev Server",
-        },
-      ]
+          {
+            url: "http://localhost:8000",
+            description: "Local Dev Server",
+          },
+        ]
       : [
-        {
-          url: host,
-          description: "Production Server",
-        },
-      ],
+          {
+            url: "/",
+            description: "Production Server",
+          },
+        ],
   tags: [
     {
       name: "Health",
